@@ -1,24 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
-from ctypes import windll
-from PIL import Image, ImageTk
-
-
-# 获取系统DPI设置
-def get_dpi_scale():
-    try:
-        return windll.shcore.GetScaleFactorForDevice(0) / 100
-    except:
-        return 1  # 如果无法获取，则返回默认值1
-
-
-# 调整图像大小
-def resize_image(image_path, width, height):
-    # 加载图像
-    image = Image.open(image_path)
-    # 调整图像大小，保持纵横比
-    image.thumbnail((width, height))
-    return ImageTk.PhotoImage(image)
+from filterColorWnd import FilterColorWnd
+from utils import resize_image, enableHighDPI
 
 
 # 打开图像文件
@@ -69,8 +52,7 @@ rootWnd.title("图像工具")
 rootWnd.geometry("800x600")
 
 # 支持Windows下的高DPI缩放
-windll.shcore.SetProcessDpiAwareness(1)
-scale_factor = get_dpi_scale()
+scale_factor = enableHighDPI()
 
 # 创建图像显示框架
 imgFrame = tk.Frame(rootWnd)
@@ -90,6 +72,12 @@ tk.Button(
     btnFrame,
     text="打开图像",
     command=openImage,
+    font=("宋体", int(12 * scale_factor)),
+).pack(side=tk.LEFT)
+tk.Button(
+    btnFrame,
+    text="颜色过滤",
+    command=lambda: FilterColorWnd(parent=rootWnd, image_path=image_path),
     font=("宋体", int(12 * scale_factor)),
 ).pack(side=tk.LEFT)
 tk.Button(
