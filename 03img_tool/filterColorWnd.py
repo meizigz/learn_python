@@ -38,18 +38,22 @@ class FilterColorWnd(tk.Toplevel):
         # 读取图片
         img = cv2.imread(self.image_path)
 
-        # 获取用户输入的RGB值
+        # 获取用户输入的多个RGB值
         rgb_str = self.rgb_entry.get()
         try:
-            r, g, b = map(int, rgb_str.split(","))
+            rgb_values = [list(map(int, rgb.split(","))) for rgb in rgb_str.split("-")]
         except ValueError:
-            tk.messagebox.showerror("错误", "请输入正确的RGB值，格式为：R,G,B")
+            tk.messagebox.showerror(
+                "错误", "请输入正确的RGB值，格式为：R,G,B R,G,B ..."
+            )
             return
 
         # 创建掩码
-        lower = np.array([b, g, r])  # OpenCV使用BGR顺序
-        upper = np.array([b, g, r])
-        mask = cv2.inRange(img, lower, upper)
+        mask = np.zeros(img.shape[:2], dtype=np.uint8)
+        for r, g, b in rgb_values:
+            lower = np.array([b, g, r])  # OpenCV使用BGR顺序
+            upper = np.array([b, g, r])
+            mask |= cv2.inRange(img, lower, upper)
 
         # 创建白色图像和黑色图像
         white_image = np.ones_like(img) * 255
