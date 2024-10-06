@@ -95,20 +95,25 @@ class FilterColorWnd(tk.Toplevel):
         img = cv2.imread(self.image_path)
 
         # 转换为HSV颜色空间
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV_FULL)
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
         # 定义灰色和偏红色的HSV范围
         if color_type == "gray":
             # 灰色的色相不重要，饱和度低
-            lower = np.array([0, 0, 1])  # 修改最小亮度为1，排除纯黑色
-            upper = np.array([0, 0, 100])
+            lower = np.array([0, 0, 10])  # 修改最小亮度为1，排除纯黑色
+            upper = np.array([179, 50, 240])
+
+            # 创建掩码
+            mask = cv2.inRange(hsv, lower, upper)
         else:  # 偏红色
             # 红色在HSV中的色相范围
-            lower = np.array([0, 70, 1])
-            upper = np.array([0, 100, 100])
-
-        # 创建掩码
-        mask = cv2.inRange(hsv, lower, upper)
+            lower1 = np.array([0, 100, 100])
+            upper1 = np.array([10, 255, 255])
+            lower2 = np.array([160, 100, 100])
+            upper2 = np.array([179, 255, 255])
+            mask1 = cv2.inRange(hsv, lower1, upper1)
+            mask2 = cv2.inRange(hsv, lower2, upper2)
+            mask = cv2.bitwise_or(mask1, mask2)
 
         # 创建白色图像
         white_image = np.ones_like(img) * 255
