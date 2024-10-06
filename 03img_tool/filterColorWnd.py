@@ -51,8 +51,12 @@ class FilterColorWnd(tk.Toplevel):
         upper = np.array([b, g, r])
         mask = cv2.inRange(img, lower, upper)
 
-        # 应用掩码
-        result = cv2.bitwise_and(img, img, mask=mask)
+        # 创建白色图像和黑色图像
+        white_image = np.ones_like(img) * 255
+        black_image = np.zeros_like(img)
+
+        # 使用掩码将指定颜色变为白色，其他颜色变为黑色
+        result = np.where(mask[:, :, None], white_image, black_image)
 
         # 转换为PIL图像
         result_rgb = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
