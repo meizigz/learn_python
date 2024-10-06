@@ -95,33 +95,27 @@ class FilterColorWnd(tk.Toplevel):
         img = cv2.imread(self.image_path)
 
         # 转换为HSV颜色空间
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV_FULL)
 
         # 定义灰色和偏红色的HSV范围
         if color_type == "gray":
             # 灰色的色相不重要，饱和度低
             lower = np.array([0, 0, 1])  # 修改最小亮度为1，排除纯黑色
-            upper = np.array([180, 30, 255])
+            upper = np.array([0, 0, 100])
         else:  # 偏红色
-            # 红色在HSV中的色相范围是0-10和160-180
-            lower1 = np.array([0, 50, 50])
-            upper1 = np.array([10, 255, 255])
-            lower2 = np.array([160, 50, 50])
-            upper2 = np.array([180, 255, 255])
+            # 红色在HSV中的色相范围
+            lower = np.array([0, 70, 1])
+            upper = np.array([0, 100, 100])
 
         # 创建掩码
-        if color_type == "gray":
-            mask = cv2.inRange(hsv, lower, upper)
-        else:
-            mask1 = cv2.inRange(hsv, lower1, upper1)
-            mask2 = cv2.inRange(hsv, lower2, upper2)
-            mask = cv2.bitwise_or(mask1, mask2)
+        mask = cv2.inRange(hsv, lower, upper)
 
         # 创建白色图像
         white_image = np.ones_like(img) * 255
+        black_image = np.zeros_like(img)
 
-        # 使用掩码将指定颜色变为白色，其他颜色保持不变
-        result = np.where(mask[:, :, None], white_image, img)
+        # 使用掩码将指定颜色变为白色
+        result = np.where(mask[:, :, None], white_image, black_image)
 
         # 转换为PIL图像
         result_rgb = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
