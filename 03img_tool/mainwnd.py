@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from filterColorWnd import FilterColorWnd
 from utils import resize_image, enableHighDPI
+from rgb2hsvWnd import RGB2HSVWnd
 
 
 # 打开图像文件
@@ -72,6 +73,12 @@ tk.Button(
     btnFrame,
     text="打开图像",
     command=openImage,
+    font=("宋体", int(12 * scale_factor)),
+).pack(side=tk.LEFT)
+tk.Button(
+    btnFrame,
+    text="RGB转HSV",
+    command=lambda: RGB2HSVWnd(parent=rootWnd),
     font=("宋体", int(12 * scale_factor)),
 ).pack(side=tk.LEFT)
 tk.Button(
